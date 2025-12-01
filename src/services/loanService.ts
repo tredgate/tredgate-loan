@@ -87,6 +87,22 @@ export function updateLoanStatus(id: string, status: LoanStatus): void {
 }
 
 /**
+ * Delete a loan by ID
+ * Removes the loan from localStorage
+ */
+export function deleteLoan(id: string): void {
+  const loans = getLoans()
+  const loanIndex = loans.findIndex(loan => loan.id === id)
+  
+  if (loanIndex === -1) {
+    throw new Error(`Loan with id ${id} not found`)
+  }
+
+  loans.splice(loanIndex, 1)
+  saveLoans(loans)
+}
+
+/**
  * Calculate the monthly payment for a loan
  * Uses a simple formula: total = amount * (1 + interestRate), monthly = total / termMonths
  */
