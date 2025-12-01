@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from '@jest/globals'
+import { describe, it, expect, beforeEach, afterEach } from '@jest/globals'
 import { mount } from '@vue/test-utils'
 import LoanSummary from '../src/components/LoanSummary.vue'
 import type { LoanApplication } from '../src/types/loan'

@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, jest } from '@jest/globals'
+import { describe, it, expect, beforeEach, afterEach, jest } from '@jest/globals'
 import { mount } from '@vue/test-utils'
 import App from '../src/App.vue'
 import LoanForm from '../src/components/LoanForm.vue'
