@@ -10,7 +10,14 @@ const emit = defineEmits<{
   approve: [id: string]
   reject: [id: string]
   autoDecide: [id: string]
-}>()
+  delete: [id: string]
+}>())
+
+function handleDelete(id: string, applicantName: string) {
+  if (confirm(`Are you sure you want to delete the loan application for ${applicantName}?`)) {
+    emit('delete', id)
+  }
+}
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', {
@@ -94,7 +101,13 @@ function formatDate(isoDate: string): string {
               >
                 ⚡
               </button>
-              <span v-if="loan.status !== 'pending'" class="no-actions">—</span>
+              <button
+                class="action-btn danger"
+                @click="handleDelete(loan.id, loan.applicantName)"
+                title="Delete"
+              >
+                🗑
+              </button>
             </td>
           </tr>
         </tbody>

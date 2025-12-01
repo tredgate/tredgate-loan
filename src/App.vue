@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import type { LoanApplication } from './types/loan'
-import { getLoans, updateLoanStatus, autoDecideLoan } from './services/loanService'
+import { getLoans, updateLoanStatus, autoDecideLoan, deleteLoan } from './services/loanService'
 import LoanForm from './components/LoanForm.vue'
 import LoanList from './components/LoanList.vue'
 import LoanSummary from './components/LoanSummary.vue'
@@ -27,6 +27,11 @@ function handleAutoDecide(id: string) {
   refreshLoans()
 }
 
+function handleDelete(id: string) {
+  deleteLoan(id)
+  refreshLoans()
+}
+
 onMounted(() => {
   refreshLoans()
 })
@@ -49,6 +54,7 @@ onMounted(() => {
         @approve="handleApprove"
         @reject="handleReject"
         @auto-decide="handleAutoDecide"
+        @delete="handleDelete"
       />
     </main>
   </div>
