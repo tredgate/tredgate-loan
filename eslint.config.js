@@ -15,7 +15,7 @@ export default tseslint.config(
     }
   },
   {
-    ignores: ['dist/', 'node_modules/', '*.config.js', '*.config.ts']
+    ignores: ['dist/', 'node_modules/', '*.config.js', '*.config.ts', '*.config.cjs', 'coverage/', 'test-report/']
   },
   {
     rules: {
