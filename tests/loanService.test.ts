@@ -4,6 +4,7 @@ import {
   saveLoans,
   createLoanApplication,
   updateLoanStatus,
+  deleteLoan,
   calculateMonthlyPayment,
   autoDecideLoan
 } from '../src/services/loanService'
@@ -172,6 +173,42 @@ describe('loanService', () => {
 
     it('throws error for non-existent loan', () => {
       expect(() => updateLoanStatus('non-existent', 'approved')).toThrow(
+        'Loan with id non-existent not found'
+      )
+    })
+  })
+
+  describe('deleteLoan', () => {
+    it('removes a loan from storage by id', () => {
+      const loans: LoanApplication[] = [
+        {
+          id: 'delete-me',
+          applicantName: 'Delete Me',
+          amount: 30000,
+          termMonths: 18,
+          interestRate: 0.07,
+          status: 'pending',
+          createdAt: '2024-01-01T00:00:00.000Z'
+        },
+        {
+          id: 'keep-me',
+          applicantName: 'Keep Me',
+          amount: 50000,
+          termMonths: 24,
+          interestRate: 0.06,
+          status: 'approved',
+          createdAt: '2024-02-01T00:00:00.000Z'
+        }
+      ]
+      saveLoans(loans)
+
+      deleteLoan('delete-me')
+
+      expect(getLoans()).toEqual([loans[1]])
+    })
+
+    it('throws error for non-existent loan', () => {
+      expect(() => deleteLoan('non-existent')).toThrow(
         'Loan with id non-existent not found'
       )
     })
