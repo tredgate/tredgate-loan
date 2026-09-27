@@ -1,4 +1,8 @@
 /**
+ * Loan domain types shared by the frontend (src/) and the backend (server/).
+ */
+
+/**
  * Union type for loan application status
  */
 export type LoanStatus = 'pending' | 'approved' | 'rejected'

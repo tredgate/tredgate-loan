@@ -12,7 +12,7 @@ const termMonths = ref<number | null>(null)
 const interestRate = ref<number | null>(null)
 const error = ref('')
 
-function handleSubmit() {
+async function handleSubmit() {
   error.value = ''
 
   // Basic validation
@@ -34,7 +34,7 @@ function handleSubmit() {
   }
 
   try {
-    createLoanApplication({
+    await createLoanApplication({
       applicantName: applicantName.value.trim(),
       amount: amount.value,
       termMonths: termMonths.value,
@@ -105,7 +105,7 @@ function handleSubmit() {
           type="number"
           min="0"
           max="1"
-          step="0.01"
+          step="0.001"
           placeholder="Enter interest rate"
           required
         />

@@ -1,0 +1,56 @@
+[
+  {
+    "id": "ln-1001",
+    "applicantName": "Amara Ndlovu",
+    "amount": 25000,
+    "termMonths": 24,
+    "interestRate": 0.08,
+    "status": "approved",
+    "createdAt": "2026-08-03T09:15:00.000Z"
+  },
+  {
+    "id": "ln-1002",
+    "applicantName": "Thabo Mokoena",
+    "amount": 120000,
+    "termMonths": 72,
+    "interestRate": 0.07,
+    "status": "rejected",
+    "createdAt": "2026-08-11T13:40:00.000Z"
+  },
+  {
+    "id": "ln-1003",
+    "applicantName": "Jana Nováková",
+    "amount": 60000,
+    "termMonths": 48,
+    "interestRate": 0.09,
+    "status": "pending",
+    "createdAt": "2026-09-02T08:05:00.000Z"
+  },
+  {
+    "id": "ln-1004",
+    "applicantName": "Sipho Dlamini",
+    "amount": 100000,
+    "termMonths": 60,
+    "interestRate": 0.085,
+    "status": "pending",
+    "createdAt": "2026-09-14T15:22:00.000Z"
+  },
+  {
+    "id": "ln-1005",
+    "applicantName": "Petra Svobodová",
+    "amount": 8000,
+    "termMonths": 12,
+    "interestRate": 0.05,
+    "status": "approved",
+    "createdAt": "2026-09-20T10:00:00.000Z"
+  },
+  {
+    "id": "ln-1006",
+    "applicantName": "Lerato Khumalo",
+    "amount": 45000,
+    "termMonths": 36,
+    "interestRate": 0.075,
+    "status": "pending",
+    "createdAt": "2026-09-25T11:30:00.000Z"
+  }
+]

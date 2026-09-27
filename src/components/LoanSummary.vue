@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { LoanApplication } from '../types/loan'
+import type { LoanApplication } from '../../shared/loan'
 
 const props = defineProps<{
   loans: LoanApplication[]
