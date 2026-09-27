@@ -6,6 +6,10 @@ This repository contains a small loan application management app used for GitHub
 
 Tredgate Loan is a teaching app, not a product. Everything runs locally with Node.js and npm: no Docker, no database, no external services. See `README.md` for the architecture, API and log format.
 
+## Questions About the Handbook
+
+`docs/handbook` is the operations handbook for Tredgate Loan (policy, operations, runbooks, API reference, known issues). It is about 80,000 tokens, so do not read it wholesale. For any question about how the system should behave or operate, or when investigating an error or a log line, use the `loan-handbook-search` skill (`.github/skills/loan-handbook-search/SKILL.md`): it calls the local search API on http://localhost:3001 (or the `search_docs` MCP tool when available, or `npm run rag -- "question"`) and returns only the relevant sections. Answer from those sections and cite the document id and heading.
+
 ## Coding Guidelines
 
 ### General Principles
@@ -55,15 +59,16 @@ Tredgate Loan is a teaching app, not a product. Everything runs locally with Nod
 - `src/services/` - API client
 - `tests/` - Vitest tests
 - `docs/handbook/` - Fictional operations handbook: policy, operations, runbooks, reference, known issues. Keep it consistent with the code: a change in validation, decisions, API or logging must update the matching handbook document.
-- `rag/` - Documentation search tool: chunks and indexes `docs/handbook`, answers `npm run rag -- "question"` with the relevant sections and a token report
+- `rag/` - Documentation search tool: chunks and indexes `docs/handbook`; CLI (`npm run rag`), HTTP API on port 3001 (`rag/server.ts`) and an optional MCP stdio server (`rag/mcp.ts`)
+- `.github/skills/loan-handbook-search/` - Skill describing how to use the search API
 - `logs/` - Runtime logs (generated, not committed)
 
 ## Commands
 
-- `npm run dev` - Start frontend (port 5173) and backend (port 3000) together
+- `npm run dev` - Start frontend (port 5173), backend (port 3000) and documentation search API (port 3001) together
 - `npm start` - Build the frontend and serve it with the API from one process
 - `npm run build` - Type-check all projects and build the frontend
 - `npm run test` - Run tests
 - `npm run lint` - Run ESLint
 - `npm run data:reset` - Restore the data file from the seed
-- `npm run rag -- "question"` - Find the handbook sections relevant to a question (`npm run rag:index` rebuilds the index)
+- `npm run rag -- "question"` - Find the handbook sections relevant to a question (`npm run rag:index` rebuilds the index, `npm run rag:serve` runs the API alone, `npm run rag:mcp` the MCP server)

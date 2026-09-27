@@ -4,9 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -c cyan,green npm:dev:web npm:dev:api",
+    "dev": "concurrently -c cyan,green,magenta npm:dev:web npm:dev:api npm:dev:rag",
     "dev:web": "vite",
     "dev:api": "tsx watch server/index.ts",
+    "dev:rag": "tsx watch rag/server.ts",
     "start": "npm run build && tsx server/index.ts",
     "build": "vue-tsc -b && vite build",
     "test": "vitest run",
@@ -14,12 +15,16 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
     "data:reset": "tsx server/reset.ts",
     "rag": "tsx rag/cli.ts",
-    "rag:index": "tsx rag/cli.ts --index"
+    "rag:index": "tsx rag/cli.ts --index",
+    "rag:serve": "tsx rag/server.ts",
+    "rag:mcp": "tsx rag/mcp.ts"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.1",
     "express": "^5.2.1",
     "pino": "^10.3.1",
-    "vue": "^3.5.24"
+    "vue": "^3.5.24",
+    "zod": "^4.6.5"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.1",
