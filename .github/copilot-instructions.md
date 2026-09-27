@@ -55,6 +55,7 @@ Tredgate Loan is a teaching app, not a product. Everything runs locally with Nod
 - `src/services/` - API client
 - `tests/` - Vitest tests
 - `docs/handbook/` - Fictional operations handbook: policy, operations, runbooks, reference, known issues. Keep it consistent with the code: a change in validation, decisions, API or logging must update the matching handbook document.
+- `rag/` - Documentation search tool: chunks and indexes `docs/handbook`, answers `npm run rag -- "question"` with the relevant sections and a token report
 - `logs/` - Runtime logs (generated, not committed)
 
 ## Commands
@@ -65,3 +66,4 @@ Tredgate Loan is a teaching app, not a product. Everything runs locally with Nod
 - `npm run test` - Run tests
 - `npm run lint` - Run ESLint
 - `npm run data:reset` - Restore the data file from the seed
+- `npm run rag -- "question"` - Find the handbook sections relevant to a question (`npm run rag:index` rebuilds the index)

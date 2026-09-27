@@ -12,7 +12,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts",
-    "data:reset": "tsx server/reset.ts"
+    "data:reset": "tsx server/reset.ts",
+    "rag": "tsx rag/cli.ts",
+    "rag:index": "tsx rag/cli.ts --index"
   },
   "dependencies": {
     "express": "^5.2.1",

@@ -143,6 +143,28 @@ Levels: 30 = info, 40 = warn (expected rejections such as 400/404), 50 = error (
 
 The fictional operations handbook for Tredgate Loan lives in [docs/handbook](docs/handbook/README.md): lending policy, operations procedures, runbooks, technical reference and the known-issues register. It is the knowledge base used in training exercises and is written to match the behaviour of this codebase.
 
+## Documentation search (RAG)
+
+`rag/` contains a minimal retrieval tool over the handbook: it splits every document into sections, indexes them with BM25 keyword search, and returns only the sections relevant to a question together with a token report. This is the mechanism behind retrieval-augmented generation (RAG): instead of sending the whole handbook to an AI assistant, send the few sections that matter.
+
+```bash
+npm run rag -- "What is the maximum amount for automatic approval?"
+npm run rag -- "port already in use" --k 3 --json     # fewer chunks, JSON for tools
+npm run rag:index                                     # rebuild the index explicitly
+```
+
+The index is cached in `rag/index.json` (not committed) and rebuilt automatically when a handbook file changes. A typical query retrieves around 1,000 tokens out of roughly 80,000, a saving of about 98%. Token counts are estimates (four characters per token).
+
+```
+rag/
+├── core/chunk.ts    # markdown → sections with frontmatter metadata
+├── core/index.ts    # tokenizer, light stemmer, BM25 statistics, index cache
+├── core/search.ts   # ranking and the token report
+├── core/tokens.ts   # token estimate
+├── config.ts        # docs root and index path (RAG_DOCS, RAG_INDEX)
+└── cli.ts           # npm run rag / npm run rag:index
+```
+
 ## Project Structure
 
 ```
@@ -174,6 +196,7 @@ tests/
 ├── loanRules.test.ts    # Business rules
 └── api.test.ts          # HTTP API against a temporary data file
 docs/handbook/           # Fictional operations handbook (policy, operations, runbooks, reference, known issues)
+rag/                     # Documentation search tool (see above)
 ```
 
 ## License

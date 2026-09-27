@@ -26,3 +26,6 @@ dist-ssr
 # Runtime data (recreated from server/data/loans.seed.json)
 server/data/loans.json
 server/data/*.tmp
+
+# Generated search index (rebuilt by npm run rag:index)
+rag/index.json

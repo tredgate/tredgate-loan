@@ -19,7 +19,7 @@ export default tseslint.config(
   },
   {
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', ignoreRestSiblings: true }],
       '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }],
       'vue/multi-word-component-names': 'off',
       'vue/singleline-html-element-content-newline': 'off',
