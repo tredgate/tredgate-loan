@@ -143,6 +143,8 @@ Levels: 30 = info, 40 = warn (expected rejections such as 400/404), 50 = error (
 
 ## Documentation
 
+Course notes for trainers and participants, including the demo scripts, are in [docs/COURSE.md](docs/COURSE.md).
+
 The fictional operations handbook for Tredgate Loan lives in [docs/handbook](docs/handbook/README.md): lending policy, operations procedures, runbooks, technical reference and the known-issues register. It is the knowledge base used in training exercises and is written to match the behaviour of this codebase.
 
 ## Documentation search (RAG)
