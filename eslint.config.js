@@ -1,35 +1,44 @@
-import js from '@eslint/js'
-import tseslint from 'typescript-eslint'
-import pluginVue from 'eslint-plugin-vue'
+import js from "@eslint/js";
+import tseslint from "typescript-eslint";
+import pluginVue from "eslint-plugin-vue";
 
 export default tseslint.config(
   js.configs.recommended,
   ...tseslint.configs.recommended,
-  ...pluginVue.configs['flat/recommended'],
+  ...pluginVue.configs["flat/recommended"],
   {
-    files: ['*.vue', '**/*.vue'],
+    files: ["*.vue", "**/*.vue"],
     languageOptions: {
       parserOptions: {
-        parser: tseslint.parser
-      }
-    }
+        parser: tseslint.parser,
+      },
+    },
   },
   {
-    ignores: ['dist/', 'node_modules/', '*.config.js', '*.config.ts']
+    ignores: [
+      "dist/",
+      "node_modules/",
+      "*.config.js",
+      "*.config.ts",
+      "course-examples/",
+    ],
   },
   {
     // legacy code, excluded until refactored
-    ignores: ['legacy/', 'scripts/nightly-fees.js']
+    ignores: ["legacy/", "scripts/nightly-fees.js"],
   },
   {
     rules: {
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', ignoreRestSiblings: true }],
-      '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }],
-      'vue/multi-word-component-names': 'off',
-      'vue/singleline-html-element-content-newline': 'off',
-      'vue/max-attributes-per-line': 'off',
-      'vue/html-self-closing': 'off',
-      'vue/attributes-order': 'off'
-    }
-  }
-)
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_", ignoreRestSiblings: true },
+      ],
+      "@typescript-eslint/no-namespace": ["error", { allowDeclarations: true }],
+      "vue/multi-word-component-names": "off",
+      "vue/singleline-html-element-content-newline": "off",
+      "vue/max-attributes-per-line": "off",
+      "vue/html-self-closing": "off",
+      "vue/attributes-order": "off",
+    },
+  },
+);

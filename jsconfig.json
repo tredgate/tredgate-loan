@@ -1,0 +1,3 @@
+{
+  "exclude": ["course-examples", "node_modules"]
+}

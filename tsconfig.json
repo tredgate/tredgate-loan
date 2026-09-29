@@ -4,5 +4,6 @@
     { "path": "./tsconfig.app.json" },
     { "path": "./tsconfig.node.json" },
     { "path": "./tsconfig.server.json" }
-  ]
+  ],
+  "exclude": ["course-examples", "node_modules"]
 }
