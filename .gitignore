@@ -30,3 +30,6 @@ server/data/*.tmp
 
 # Generated search index (rebuilt by npm run rag:index)
 rag/index.json
+
+# Nightly fee run output (recreated by npm run legacy:nightly)
+legacy/data/*.out.json

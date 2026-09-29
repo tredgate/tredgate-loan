@@ -17,7 +17,8 @@
     "rag": "tsx rag/cli.ts",
     "rag:index": "tsx rag/cli.ts --index",
     "rag:serve": "tsx rag/server.ts",
-    "rag:mcp": "tsx rag/mcp.ts"
+    "rag:mcp": "tsx rag/mcp.ts",
+    "legacy:nightly": "node scripts/nightly-fees.js"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.1",

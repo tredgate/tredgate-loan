@@ -18,6 +18,10 @@ export default tseslint.config(
     ignores: ['dist/', 'node_modules/', '*.config.js', '*.config.ts']
   },
   {
+    // legacy code, excluded until refactored
+    ignores: ['legacy/', 'scripts/nightly-fees.js']
+  },
+  {
     rules: {
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', ignoreRestSiblings: true }],
       '@typescript-eslint/no-namespace': ['error', { allowDeclarations: true }],

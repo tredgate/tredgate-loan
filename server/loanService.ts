@@ -12,6 +12,14 @@ export function createLoanService(store: LoanStore) {
       return store.read()
     },
 
+    async get(id: string): Promise<LoanApplication> {
+      const loan = (await store.read()).find(l => l.id === id)
+      if (!loan) {
+        throw new HttpError(404, `Loan with id ${id} not found`)
+      }
+      return loan
+    },
+
     create(input: CreateLoanInput): Promise<LoanApplication> {
       validateLoanInput(input)
 

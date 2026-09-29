@@ -1,9 +1,23 @@
 import express from 'express'
-import type { LoanStatus } from '../shared/loan'
+import { createRequire } from 'node:module'
+import type { LoanApplication, LoanStatus } from '../shared/loan'
 import { HttpError, errorHandler, notFoundHandler } from './errors'
 import { requestLogger, type Logger } from './logger'
 import { createLoanService } from './loanService'
 import type { LoanStore } from './loanStore'
+
+type SettlementQuote = -1 | { st: string; [field: string]: unknown }
+
+// Servicing rules taken over from the old core banking integration (CommonJS, untyped)
+const servicing = createRequire(import.meta.url)('../legacy/servicing/settlement.js') as {
+  quote(loan: LoanApplication, paid: unknown, date: unknown): SettlementQuote
+}
+
+const QUOTE_ERRORS: Record<string, string> = {
+  ERR_1: 'paid must be a whole number of installments, 0 or more',
+  ERR_2: 'paid must be less than the loan term',
+  ERR_3: 'date must be a valid date in YYYY-MM-DD format'
+}
 
 export interface AppOptions {
   store: LoanStore
@@ -51,6 +65,20 @@ export function createApp({ store, logger, staticDir }: AppOptions) {
     const loan = await loans.autoDecide(req.params.id)
     req.log.info({ loanId: loan.id, status: loan.status }, 'loan auto-decided')
     res.json(loan)
+  })
+
+  app.get('/api/loans/:id/settlement-quote', async (req, res) => {
+    const loan = await loans.get(req.params.id)
+    if (loan.status !== 'approved') {
+      throw new HttpError(409, `Loan with id ${loan.id} is not approved (${loan.status})`)
+    }
+    const quote = servicing.quote(loan, req.query.paid, req.query.date)
+    if (quote === -1 || quote.st !== 'OK') {
+      const code = quote === -1 ? 'ERR_0' : quote.st
+      throw new HttpError(400, QUOTE_ERRORS[code] ?? `Settlement quote failed (${code})`)
+    }
+    req.log.info({ loanId: loan.id, paid: quote.paid, total: quote.total }, 'settlement quoted')
+    res.json(quote)
   })
 
   app.use('/api', notFoundHandler)
