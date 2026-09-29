@@ -33,3 +33,5 @@ rag/index.json
 
 # Nightly fee run output (recreated by npm run legacy:nightly)
 legacy/data/*.out.json
+.playwright-mcp/
+reports/

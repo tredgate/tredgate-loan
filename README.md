@@ -6,7 +6,7 @@ A small loan application management app used for GitHub Copilot training. Vue 3 
 
 Tredgate Loan is a teaching app, not a product. It is deliberately small so it can be understood in minutes, yet it has the pieces a real service has: an HTTP API, persisted data, validation, business rules and logs you can investigate.
 
-Everything runs locally with Node.js and npm. No Docker, no database, no external services.
+Everything runs locally with Node.js and npm. No Docker, no database, no external services. The only exception is the optional [vector search demo](#vector-search-demo-trainer-only) the trainer runs, which is a separate package and is not part of the participant setup.
 
 ## Features
 
@@ -149,7 +149,7 @@ The fictional operations handbook for Tredgate Loan lives in [docs/handbook](doc
 
 ## Documentation search (RAG)
 
-`rag/` contains a minimal retrieval tool over the handbook: it splits every document into sections, indexes them wit11h BM25 keyword search, and returns only the sections relevant to a question together with a token report. This is the mechanism behind retrieval-augmented generation (RAG): instead of sending the whole handbook to an AI assistant, send the few sections that matter.
+`rag/` contains a minimal retrieval tool over the handbook: it splits every document into sections, indexes them with BM25 keyword search, and returns only the sections relevant to a question together with a token report. This is the mechanism behind retrieval-augmented generation (RAG): instead of sending the whole handbook to an AI assistant, send the few sections that matter.
 
 ```bash
 npm run rag -- "What is the maximum amount for automatic approval?"
@@ -186,7 +186,24 @@ rag/
 
 ### Vector search demo (trainer only)
 
-`services/vector-rag/` is a second retriever over the same handbook, used by the trainer for a show-and-tell of a production-style vector RAG: sections are embedded with an Ollama model (nomic-embed-text) and stored in Qdrant, a vector database, both started with Docker. It exposes the same `/search` API on port 3002 plus `/compare`, which runs one question through BM25 and vectors side by side. It is a separate package with its own `npm install`, so the participant setup above is unaffected. See [services/vector-rag/README.md](services/vector-rag/README.md).
+`services/vector-rag/` is a second retriever over the same handbook, used by the trainer to show what a production-style vector RAG looks like. Where `rag/` ranks sections by keywords (BM25), this service embeds the same sections with an Ollama model (nomic-embed-text) and asks Qdrant, a vector database, for the nearest ones. Both run in Docker.
+
+- It serves the same `/search` API as `rag/`, but on port 3002.
+- `/compare` runs one question through BM25 and vector search side by side.
+- It is a separate package with its own `npm install`, so the participant setup above is unaffected.
+
+```bash
+cd services/vector-rag
+npm install
+npm run up            # Qdrant (:6333) and Ollama (:11434) in Docker
+npm run model:pull    # download the embedding model once (~300 MB)
+npm run index         # embed the handbook
+npm run dev           # API on http://localhost:3002
+npm run search -- "customer pays late" --compare
+npm run down          # stop the containers
+```
+
+Configuration, routes and file layout are in [services/vector-rag/README.md](services/vector-rag/README.md). The trainer's demo script is in [docs/COURSE.md](docs/COURSE.md).
 
 ## Project Structure
 
