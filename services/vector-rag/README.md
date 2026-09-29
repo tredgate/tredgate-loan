@@ -23,6 +23,7 @@ npm run up            # Qdrant on :6333 (dashboard at /dashboard), Ollama on :11
 npm run model:pull    # downloads nomic-embed-text into Ollama once (~300 MB)
 npm run index         # embeds the handbook: 34 files, 344 vectors, about a minute on the CPU
 npm run dev           # the API on http://localhost:3002
+npm run down          # stops the containers; add `-v` to also delete the stored vectors and model
 ```
 
 If Ollama is installed natively (faster on Apple Silicon), start only Qdrant: `docker compose up -d qdrant`. The service talks to whatever answers on `OLLAMA_URL`.
@@ -36,25 +37,25 @@ npm run search -- "KI-003" --compare                      # where keywords win
 curl "http://localhost:3002/compare?q=port+already+in+use&k=3"
 ```
 
-| Route | Purpose |
-|---|---|
-| `GET /health` | Ollama and Qdrant reachable? model present? what is indexed |
-| `GET /search?q=&k=` | Vector search, same response shape as the BM25 API |
-| `GET /compare?q=&k=` | The same question through both retrievers |
-| `POST /reindex` | Re-embed the handbook and rebuild the collection |
+| Route                | Purpose                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| `GET /health`        | Ollama and Qdrant reachable? model present? what is indexed |
+| `GET /search?q=&k=`  | Vector search, same response shape as the BM25 API          |
+| `GET /compare?q=&k=` | The same question through both retrievers                   |
+| `POST /reindex`      | Re-embed the handbook and rebuild the collection            |
 
 Scores are cosine similarities (1 = same meaning). BM25 scores are keyword weights. Compare the ranking, not the numbers.
 
 ## Configuration
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `VECTOR_PORT` | `3002` | API port |
-| `OLLAMA_URL` | `http://localhost:11434` | Where Ollama runs |
-| `EMBED_MODEL` | `nomic-embed-text` | Any Ollama embedding model; a change triggers a reindex |
-| `QDRANT_URL` | `http://localhost:6333` | Where Qdrant runs |
-| `QDRANT_COLLECTION` | `tredgate-handbook` | Collection name |
-| `RAG_DOCS`, `RAG_INDEX` | as in `rag/` | Handbook folder and the BM25 index used by `/compare` |
+| Variable                | Default                  | Purpose                                                 |
+| ----------------------- | ------------------------ | ------------------------------------------------------- |
+| `VECTOR_PORT`           | `3002`                   | API port                                                |
+| `OLLAMA_URL`            | `http://localhost:11434` | Where Ollama runs                                       |
+| `EMBED_MODEL`           | `nomic-embed-text`       | Any Ollama embedding model; a change triggers a reindex |
+| `QDRANT_URL`            | `http://localhost:6333`  | Where Qdrant runs                                       |
+| `QDRANT_COLLECTION`     | `tredgate-handbook`      | Collection name                                         |
+| `RAG_DOCS`, `RAG_INDEX` | as in `rag/`             | Handbook folder and the BM25 index used by `/compare`   |
 
 ## Files
 
