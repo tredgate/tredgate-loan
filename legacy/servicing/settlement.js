@@ -3,11 +3,10 @@
 var U = require('./util');
 var F = require('./fees');
 var A = require('./arrears');
+var S = require('../../shared/servicing.ts');
 
 function split(l) {
-  var p = l.amount / l.termMonths;
-  var i = (l.amount * l.interestRate) / l.termMonths;
-  return { prin: U.r2(p), int: U.r2(i), inst: U.r2(p + i) };
+  return S.splitInstallment(l.amount, l.termMonths, l.interestRate);
 }
 
 function sched(l) {
@@ -31,71 +30,31 @@ function quote(l, paid, dt) {
 
   if (A.chk(l, asOf, x2) === -1) return { st: 'ERR_3' };
 
-  var tmp = (l.amount * (l.termMonths - x2)) / l.termMonths;
-  var pct = parseFloat(U.cfg('SETTLE_FEE_PCT', '0.01'));
-  var w = x2 * 2 > l.termMonths;
-  var fee = w ? '0.00' : F.fee('settle', tmp, pct);
-  var tot = w ? U.r2(tmp) : Math.round((tmp + tmp * pct) * 100) / 100;
-
   // if (tot > 50000) {
   //   notify('collections@tredgate.example', 'large settlement ' + l.id + ' ' + tot);
   // }
 
-  var res = {
-    st: 'OK',
-    id: l.id,
-    asOf: U.fmt(asOf),
-    paid: x2,
-    left: l.termMonths - x2,
-    rp: U.r2(tmp),
-    fee: fee,
-    waived: w,
-    total: tot,
-    dpd: l.dpd,
-    stage: A.label(l.stg),
-    lateFees: A.adj(l, F.sumLate(l))
-  };
-  console.log('settlement quote', l.id, 'paid', x2, 'total', tot);
+  var pct = parseFloat(U.cfg('SETTLE_FEE_PCT', '0.01'));
+  var lateFees = A.adj(l, F.sumLate(l));
+  var res = S.calcSettlementResult(
+    l.id, l.amount, l.termMonths, x2, asOf,
+    l.dpd, A.label(l.stg), lateFees, pct
+  );
+  console.log('settlement quote', l.id, 'paid', x2, 'total', res.total);
   return res;
 }
 
 function alloc(it, amt) {
-  var x = U.money(amt);
-  if (x <= 0) return 0;
-
-  var f = U.money(it.fees);
-  if (x >= f) {
-    x = x - f;
-    it.fees = 0;
-  } else {
-    it.fees = U.r2(f - x);
-    return 0;
-  }
-
-  var i2 = U.money(it.int);
-  if (x >= i2) {
-    x = x - i2;
-    it.int = 0;
-  } else {
-    it.int = U.r2(i2 - x);
-    return 0;
-  }
-
-  var p = U.money(it.prin);
-  if (x >= p) {
-    x = x - p;
-    it.prin = 0;
-  } else {
-    it.prin = U.r2(p - x);
-    return 0;
-  }
-
-  U.log('alloc', it.id, 'overpaid', x);
-  return U.r2(x);
+  var res = S.allocPayment(it.fees, it.int, it.prin, amt);
+  it.fees = res.fees;
+  it.int = res.int;
+  it.prin = res.prin;
+  if (res.overpayment > 0) U.log('alloc', it.id, 'overpaid', res.overpayment);
+  return res.overpayment;
 }
 
 function isClear(it) {
-  return U.money(it.fees) == 0 && U.money(it.int) == 0 && U.money(it.prin) == 0;
+  return S.isItemClear(it.fees, it.int, it.prin);
 }
 
 module.exports = {

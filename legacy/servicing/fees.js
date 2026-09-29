@@ -1,14 +1,11 @@
 'use strict';
 
 var U = require('./util');
+var S = require('../../shared/servicing.ts');
 
 var handlers = {
   calc_orig: function (l) {
-    var a = U.money(l && l.amount !== undefined ? l.amount : l);
-    var f = a * 0.015;
-    if (f < 50) f = 50;
-    if (f > 1500) f = 1500;
-    return f.toFixed(2);
+    return S.calcOrigFee(l);
   },
 
   calc_late: function (x) {
@@ -16,17 +13,16 @@ var handlers = {
     if (x && typeof x.dpd == 'number') d = x.dpd;
     else if (U.C.last) d = U.C.last.dpd;
     else d = 0;
-    if (d >= 10) return (25).toFixed(2);
-    return '0.00';
+    return S.calcLateFee(d);
   },
 
   calc_ret: function () {
-    return (15).toFixed(2);
+    return S.calcRetFee();
   },
 
   calc_settle: function (rp, pct) {
     var p = pct === undefined ? 0.01 : pct;
-    return (U.money(rp) * p).toFixed(2);
+    return S.calcSettleFee(U.money(rp), p);
   }
 };
 
