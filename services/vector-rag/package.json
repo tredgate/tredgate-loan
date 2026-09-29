@@ -1,0 +1,32 @@
+{
+  "name": "tredgate-loan-vector-rag",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Demo vector RAG over the Tredgate Loan handbook: Ollama embeddings + Qdrant. Trainer demo only, not part of the participant setup.",
+  "scripts": {
+    "up": "docker compose up -d",
+    "down": "docker compose down",
+    "model:pull": "tsx pull-model.ts",
+    "index": "tsx cli.ts --index",
+    "search": "tsx cli.ts",
+    "dev": "tsx watch server.ts",
+    "start": "tsx server.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@qdrant/js-client-rest": "^1.19.0",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "~5.9.3",
+    "vitest": "4.0.13"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

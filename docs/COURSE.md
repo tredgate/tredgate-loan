@@ -14,6 +14,7 @@ The operations handbook in [docs/handbook](handbook/README.md) is written as if 
 | Documentation search | `rag/` | Splits the handbook into sections, ranks them with BM25, reports token savings. CLI, HTTP API and optional MCP server |
 | Copilot integration | `.github/copilot-instructions.md`, `.github/skills/loan-handbook-search/`, `.vscode/mcp.json` | Repository instructions, a skill describing the search API, and an MCP configuration |
 | Tests | `tests/` | Business rules, HTTP API, search, MCP server |
+| Vector search demo | `services/vector-rag/` | Trainer-only: the same handbook embedded with Ollama and stored in Qdrant, with a side-by-side comparison against BM25. Own package, needs Docker |
 
 Custom agents and prompt files are not part of the repository. Participants build them during the course. The baseline is tagged `v1.1.0-baseline`; prepared bugs for the triage exercises are added later on a separate branch so that the baseline stays clean.
 
@@ -113,6 +114,33 @@ Goal: close the loop between a fix and the documentation.
 
 This is the step the triage exercises end with: fix, test, document, reindex.
 
+## Demo 4: the same question, with vectors (trainer's machine only)
+
+Goal: show what production systems use instead of keyword search, and that the loop stays the same: chunk, retrieve, inject, count. Participants watch; their machines cannot run Docker or download a model.
+
+Preparation, once, before the course (see [services/vector-rag/README.md](../services/vector-rag/README.md)):
+
+```bash
+cd services/vector-rag
+npm install
+npm run up            # Qdrant and Ollama in Docker
+npm run model:pull    # nomic-embed-text, about 300 MB
+npm run index         # 344 vectors in under a minute
+```
+
+1. Open the Qdrant dashboard at http://localhost:6333/dashboard, collection `tredgate-handbook`: 344 points, 768 numbers each, and the section text as payload. This is the whole "vector database" story in one screen.
+2. Ask a question that shares no words with the answer, side by side:
+
+   ```bash
+   npm run search -- "who is allowed to approve a loan above the automatic limit" --compare
+   ```
+
+   BM25 lands on POL-010 (ownership) because of the word "approve"; vectors return POL-050, the approval authority ladder, first. Same with `"how do I wipe the data and start again"`: keywords find nothing useful, vectors return RB-006.
+3. Now the other way round: `npm run search -- "KI-003" --compare`. Keywords find the document by its id in one hit; vectors return the known-issues index and the changelog, because an id has no meaning to embed. Exact identifiers and log lines are where keyword search stays strong, which is why real systems combine both (hybrid search).
+4. Show the code path is the same as in `rag/`: `services/vector-rag/indexer.ts` uses the very same chunker, only `embed.ts` (Ollama) and `store.ts` (Qdrant) are new. `store.ts` also contains a ten-line in-memory version of the store, which is the honest explanation of what Qdrant does: cosine similarity over all vectors, best first.
+
+Point out on the way: scores are cosine similarities (0.6 to 0.8 here) and not comparable with BM25 scores; the token report is identical because the chunks are; changing `EMBED_MODEL` triggers a reindex, so models are interchangeable.
+
 ## Triage exercises (prepared later)
 
 The backend was built so that bugs leave realistic traces:
@@ -136,6 +164,7 @@ Prepared bugs will be patch files on a separate branch, each with a symptom-only
 | `npm run rag:index` | Rebuild the search index |
 | `npm run rag:serve` | Run the search API alone |
 | `npm run rag:mcp` | Run the MCP server by hand (for debugging) |
+| `cd services/vector-rag && npm run search -- "question" --compare` | Trainer demo: BM25 and vectors side by side (needs `npm run up` there) |
 | `tail -f logs/app.log` | Watch the backend log |
 
 ## Troubleshooting during the course

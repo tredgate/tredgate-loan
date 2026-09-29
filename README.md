@@ -184,6 +184,10 @@ rag/
 └── mcp.ts           # npm run rag:mcp (optional MCP stdio server)
 ```
 
+### Vector search demo (trainer only)
+
+`services/vector-rag/` is a second retriever over the same handbook, used by the trainer for a show-and-tell of a production-style vector RAG: sections are embedded with an Ollama model (nomic-embed-text) and stored in Qdrant, a vector database, both started with Docker. It exposes the same `/search` API on port 3002 plus `/compare`, which runs one question through BM25 and vectors side by side. It is a separate package with its own `npm install`, so the participant setup above is unaffected. See [services/vector-rag/README.md](services/vector-rag/README.md).
+
 ## Project Structure
 
 ```
@@ -216,6 +220,7 @@ tests/
 └── api.test.ts          # HTTP API against a temporary data file
 docs/handbook/           # Fictional operations handbook (policy, operations, runbooks, reference, known issues)
 rag/                     # Documentation search tool (see above)
+services/vector-rag/     # Vector search demo: Ollama embeddings + Qdrant (trainer only, own package)
 ```
 
 ## License
