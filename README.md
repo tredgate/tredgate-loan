@@ -48,10 +48,10 @@ npm run dev
 
 This starts three processes:
 
-| Process | URL | Notes |
-|---|---|---|
-| Frontend (Vite) | http://localhost:5173 | Proxies `/api/*` to the backend |
-| Backend (Express) | http://localhost:3000 | API, data file and logs |
+| Process                        | URL                   | Notes                                |
+| ------------------------------ | --------------------- | ------------------------------------ |
+| Frontend (Vite)                | http://localhost:5173 | Proxies `/api/*` to the backend      |
+| Backend (Express)              | http://localhost:3000 | API, data file and logs              |
 | Documentation search (Express) | http://localhost:3001 | RAG API over the handbook, see below |
 
 Open http://localhost:5173 in the browser.
@@ -99,13 +99,13 @@ Browser (Vue)  ──fetch /api──▶  Vite dev server  ──proxy──▶ 
 
 All endpoints are under `/api` and use JSON.
 
-| Method | Path | Description | Responses |
-|---|---|---|---|
-| GET | `/api/health` | Liveness check | 200 |
-| GET | `/api/loans` | List all loan applications | 200 |
-| POST | `/api/loans` | Create a loan application | 201, 400 on validation error |
-| PATCH | `/api/loans/:id/status` | Approve or reject a pending loan: `{ "status": "approved" \| "rejected" }` | 200, 400, 404, 409 if already decided |
-| POST | `/api/loans/:id/auto-decide` | Apply the lending policy rules to a pending loan | 200, 404, 409 if already decided |
+| Method | Path                         | Description                                                                | Responses                             |
+| ------ | ---------------------------- | -------------------------------------------------------------------------- | ------------------------------------- |
+| GET    | `/api/health`                | Liveness check                                                             | 200                                   |
+| GET    | `/api/loans`                 | List all loan applications                                                 | 200                                   |
+| POST   | `/api/loans`                 | Create a loan application                                                  | 201, 400 on validation error          |
+| PATCH  | `/api/loans/:id/status`      | Approve or reject a pending loan: `{ "status": "approved" \| "rejected" }` | 200, 400, 404, 409 if already decided |
+| POST   | `/api/loans/:id/auto-decide` | Apply the lending policy rules to a pending loan                           | 200, 404, 409 if already decided      |
 
 Errors are returned as `{ "error": "message" }`. Unexpected errors return 500 with a generic message and the full stack trace goes to the log.
 
@@ -133,13 +133,13 @@ Levels: 30 = info, 40 = warn (expected rejections such as 400/404), 50 = error (
 
 **Environment variables** (all optional):
 
-| Variable | Default | Purpose |
-|---|---|---|
-| `PORT` | `3000` | Backend port |
-| `DATA_FILE` | `server/data/loans.json` | Location of the data file |
-| `LOG_FILE` | `logs/app.log` | Location of the log file |
-| `LOG_LEVEL` | `info` | pino log level (`debug`, `info`, `warn`, `error`) |
-| `RAG_PORT` | `3001` | Documentation search API port |
+| Variable    | Default                  | Purpose                                           |
+| ----------- | ------------------------ | ------------------------------------------------- |
+| `PORT`      | `3000`                   | Backend port                                      |
+| `DATA_FILE` | `server/data/loans.json` | Location of the data file                         |
+| `LOG_FILE`  | `logs/app.log`           | Location of the log file                          |
+| `LOG_LEVEL` | `info`                   | pino log level (`debug`, `info`, `warn`, `error`) |
+| `RAG_PORT`  | `3001`                   | Documentation search API port                     |
 
 ## Documentation
 
@@ -149,7 +149,7 @@ The fictional operations handbook for Tredgate Loan lives in [docs/handbook](doc
 
 ## Documentation search (RAG)
 
-`rag/` contains a minimal retrieval tool over the handbook: it splits every document into sections, indexes them with BM25 keyword search, and returns only the sections relevant to a question together with a token report. This is the mechanism behind retrieval-augmented generation (RAG): instead of sending the whole handbook to an AI assistant, send the few sections that matter.
+`rag/` contains a minimal retrieval tool over the handbook: it splits every document into sections, indexes them wit11h BM25 keyword search, and returns only the sections relevant to a question together with a token report. This is the mechanism behind retrieval-augmented generation (RAG): instead of sending the whole handbook to an AI assistant, send the few sections that matter.
 
 ```bash
 npm run rag -- "What is the maximum amount for automatic approval?"
@@ -163,11 +163,11 @@ The index is cached in `rag/index.json` (not committed) and rebuilt automaticall
 
 The same search is exposed three ways, so that it works whatever the editor policy allows:
 
-| Entry point | How | When |
-|---|---|---|
-| HTTP API | `GET http://localhost:3001/search?q=...&k=5`, `GET /health`, `POST /reindex`; started by `npm run dev` or `npm run rag:serve` | Default. Any assistant that can run `curl` can use it. |
-| Skill | `.github/skills/loan-handbook-search/SKILL.md` documents the API for GitHub Copilot, which loads it for handbook questions | Together with the API |
-| MCP server | `rag/mcp.ts` exposes a `search_docs` tool over stdio; configured in `.vscode/mcp.json` (`npm run rag:mcp` runs it by hand) | Optional, where MCP servers are allowed |
+| Entry point | How                                                                                                                           | When                                                   |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
+| HTTP API    | `GET http://localhost:3001/search?q=...&k=5`, `GET /health`, `POST /reindex`; started by `npm run dev` or `npm run rag:serve` | Default. Any assistant that can run `curl` can use it. |
+| Skill       | `.github/skills/loan-handbook-search/SKILL.md` documents the API for GitHub Copilot, which loads it for handbook questions    | Together with the API                                  |
+| MCP server  | `rag/mcp.ts` exposes a `search_docs` tool over stdio; configured in `.vscode/mcp.json` (`npm run rag:mcp` runs it by hand)    | Optional, where MCP servers are allowed                |
 
 Repository instructions in `.github/copilot-instructions.md` tell Copilot to use the search instead of reading the handbook.
 
