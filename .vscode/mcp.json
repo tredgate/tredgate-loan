@@ -2,7 +2,7 @@
   "servers": {
     "tredgate-docs": {
       "type": "stdio",
-      "command": "/Users/petrfifka/.nvm/versions/node/v24.18.0/bin/npx",
+      "command": "npx",
       "args": ["tsx", "rag/mcp.ts"]
     }
   }
