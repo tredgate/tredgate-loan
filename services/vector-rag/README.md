@@ -19,8 +19,15 @@ docs/handbook ──▶ rag/core/chunk.ts (same chunks as BM25)
 ```bash
 cd services/vector-rag
 npm install
-npm run up            # Qdrant on :6333 (dashboard at /dashboard), Ollama on :11434, both in Docker
-npm run model:pull    # downloads nomic-embed-text into Ollama once (~300 MB)
+
+# Start Qdrant and pull the embedding model from Ollama natively
+docker compose up -d qdrant   # only Qdrant in Docker (:6333)
+ollama pull nomic-embed-text  # the embedding model, in the native Ollama app (~300 MB)
+
+# Alternatively: full docker without Ollama
+# npm run up            # Qdrant on :6333 (dashboard at /dashboard), Ollama on :11434, both in Docker
+# npm run model:pull    # downloads nomic-embed-text into Ollama once (~300 MB)
+
 npm run index         # embeds the handbook: 34 files, 344 vectors, about a minute on the CPU
 npm run dev           # the API on http://localhost:3002
 npm run down          # stops the containers; add `-v` to also delete the stored vectors and model
