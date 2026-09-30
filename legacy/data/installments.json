@@ -1,0 +1,17 @@
+{
+  "exported": "2026-10-14T22:00:00Z",
+  "bizDate": "2026-10-15",
+  "items": [
+    { "id": "I-5001", "loan": "ln-1001", "no": 1, "due_date": "2026-09-03", "amt": 1125, "prin": 0, "int": 0, "fees": 0, "paid": true, "ret": false, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5002", "loan": "ln-1001", "no": 2, "due_date": "2026-10-03", "amt": 1125, "prin": 1041.67, "int": 83.33, "fees": 0, "paid": false, "ret": false, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5003", "loan": "cb-40117", "no": 9, "due_date": "2026-10-05", "amt": 530, "prin": 500, "int": 30, "fees": 0, "paid": false, "ret": false, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5004", "loan": "cb-40117", "no": 8, "due_date": "2026-09-05", "amt": 530, "prin": 500, "int": 30, "fees": 25, "paid": false, "ret": false, "rfc": false, "lfc": true, "hs": null, "rcv": 0 },
+    { "id": "I-5005", "loan": "cb-40952", "no": 4, "due_date": "2026-09-28", "amt": 327, "prin": 300, "int": 27, "fees": 0, "paid": false, "ret": true, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5006", "loan": "cb-40952", "no": 5, "due_date": "2026-10-28", "amt": 327, "prin": 300, "int": 27, "fees": 0, "paid": false, "ret": false, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5007", "loan": "cb-41230", "no": 14, "due_date": "2026-08-12", "amt": 1362.5, "prin": 1250, "int": 112.5, "fees": 0, "paid": false, "ret": false, "rfc": false, "lfc": false, "hs": { "a": 1, "from": "2026-08-20", "opt": "HOL" }, "rcv": 0 },
+    { "id": "I-5008", "loan": "ln-1005", "no": 1, "due_date": "2026-10-20", "amt": 700, "prin": 666.67, "int": 33.33, "fees": 0, "paid": false, "ret": false, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5009", "loan": "cb-39870", "no": 19, "due_date": "2026-08-24", "amt": 594.45, "prin": 555.56, "int": 38.89, "fees": 25, "paid": false, "ret": false, "rfc": false, "lfc": true, "hs": null, "rcv": 400 },
+    { "id": "I-5010", "loan": "cb-39870", "no": 20, "due_date": "2026-09-24", "amt": 594.45, "prin": 555.56, "int": 38.89, "fees": 0, "paid": false, "ret": false, "rfc": false, "lfc": false, "hs": null, "rcv": 0 },
+    { "id": "I-5011", "loan": "cb-35500", "no": 30, "due_date": "2026-06-30", "amt": 812.5, "prin": 750, "int": 62.5, "fees": 25, "paid": false, "ret": false, "rfc": false, "lfc": true, "hs": null, "rcv": 0 }
+  ]
+}

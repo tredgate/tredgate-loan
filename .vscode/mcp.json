@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "tredgate-docs": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "rag/mcp.ts"]
+    }
+  }
+}

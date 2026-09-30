@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { LoanApplication } from '../types/loan'
-import { calculateMonthlyPayment } from '../services/loanService'
+import type { LoanApplication } from '../../shared/loan'
+import { calculateMonthlyPayment } from '../../shared/loanRules'
 
 defineProps<{
   loans: LoanApplication[]
