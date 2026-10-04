@@ -1,3 +1,0 @@
-node_modules
-# Local record of what was indexed into Qdrant (rebuilt by npm run index)
-.cache
