@@ -4,8 +4,10 @@ import * as z from 'zod/v4'
 import type { LoanApplication } from '../../shared/loan'
 import { calculateMonthlyPayment } from '../../shared/loanRules'
 
+// The Loan API, the same API the web app uses. Override with LOAN_API_URL
 const API_URL = process.env.LOAN_API_URL ?? 'http://localhost:3000/api'
 
+// Loads all loans. The API has no endpoint for a single loan
 async function fetchLoans(): Promise<LoanApplication[]> {
   let response: Response
   try {
@@ -20,6 +22,7 @@ async function fetchLoans(): Promise<LoanApplication[]> {
 }
 
 serveStdio(() => {
+  // Instructions are sent to the client in the initialize answer and tell the model how to read the data
   const server = new McpServer(
     { name: 'tredgate-loan', version: '1.0.0' },
     {
@@ -28,6 +31,7 @@ serveStdio(() => {
     }
   )
 
+  // Tool: one loan by its id
   server.registerTool(
     'get_loan',
     {
@@ -40,10 +44,10 @@ serveStdio(() => {
     },
     async ({ id }) => {
       const loans = await fetchLoans()
-      const loan = loans.find(l => l.id === id)
+      const loan = loans.find((l) => l.id === id)
       if (!loan) {
         return {
-          content: [{ type: 'text', text: `No loan with id "${id}". Known ids: ${loans.map(l => l.id).join(', ')}` }],
+          content: [{ type: 'text', text: `No loan with id "${id}". Known ids: ${loans.map((l) => l.id).join(', ')}` }],
           isError: true
         }
       }
@@ -51,6 +55,7 @@ serveStdio(() => {
     }
   )
 
+  // Tool: all loans, optionally filtered by status. One short line per loan instead of JSON
   server.registerTool(
     'list_loans',
     {
@@ -62,12 +67,13 @@ serveStdio(() => {
       })
     },
     async ({ status }) => {
-      const loans = (await fetchLoans()).filter(l => !status || l.status === status)
-      const lines = loans.map(l => `${l.id}: ${l.amount} USD, ${l.termMonths} months, ${l.status}`)
+      const loans = (await fetchLoans()).filter((l) => !status || l.status === status)
+      const lines = loans.map((l) => `${l.id}: ${l.amount} USD, ${l.termMonths} months, ${l.status}`)
       return { content: [{ type: 'text', text: lines.join('\n') || 'No loans found.' }] }
     }
   )
 
+  // Tool: the installment from the shared business rules (POL-030), never a copy of the formula
   server.registerTool(
     'calculate_installment',
     {
@@ -89,16 +95,17 @@ serveStdio(() => {
     }
   )
 
+  // Resource template: loan://{id}. The user attaches a loan, the model does not ask for it
   server.registerResource(
     'loan',
     new ResourceTemplate('loan://{id}', {
       list: async () => ({
-        resources: (await fetchLoans()).map(l => ({ uri: `loan://${l.id}`, name: l.id, mimeType: 'application/json' }))
+        resources: (await fetchLoans()).map((l) => ({ uri: `loan://${l.id}`, name: l.id, mimeType: 'application/json' }))
       })
     }),
     { title: 'Loan application', description: 'One loan application as JSON', mimeType: 'application/json' },
     async (uri, { id }) => {
-      const loan = (await fetchLoans()).find(l => l.id === id)
+      const loan = (await fetchLoans()).find((l) => l.id === id)
       if (!loan) {
         throw new Error(`No loan with id "${id}"`)
       }
@@ -106,6 +113,7 @@ serveStdio(() => {
     }
   )
 
+  // Prompt: a ready-made task the user starts with /mcp.tredgate-loan.review-loan
   server.registerPrompt(
     'review-loan',
     {
