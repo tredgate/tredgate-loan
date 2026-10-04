@@ -26,30 +26,36 @@
     "@modelcontextprotocol/node": "^2.1.1",
     "@modelcontextprotocol/server": "^2.3.0",
     "express": "^5.2.1",
-    "pino": "^10.3.1",
-    "vue": "^3.5.24",
+    "pino": "^10.4.0",
+    "vue": "^3.5.43",
     "zod": "^4.6.5"
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.1",
+    "@eslint/js": "^9.39.5",
     "@modelcontextprotocol/inspector": "^2.9.0",
     "@types/express": "^5.0.6",
-    "@types/node": "^24.10.1",
-    "@vitejs/plugin-vue": "^6.0.1",
-    "@vue/test-utils": "^2.4.6",
+    "@types/node": "^24.19.1",
+    "@vitejs/plugin-vue": "^6.0.9",
+    "@vue/test-utils": "^2.5.1",
     "@vue/tsconfig": "^0.8.1",
     "concurrently": "^10.0.5",
-    "eslint": "^9.39.1",
-    "eslint-plugin-vue": "^10.6.0",
-    "jsdom": "^27.2.0",
+    "eslint": "^9.39.5",
+    "eslint-plugin-vue": "^10.11.1",
+    "jsdom": "^27.4.0",
     "tsx": "^4.23.15",
     "typescript": "~5.9.3",
-    "typescript-eslint": "^8.48.0",
-    "vite": "^7.2.4",
-    "vitest": "^4.0.13",
-    "vue-tsc": "^3.1.4"
+    "typescript-eslint": "^8.71.0",
+    "vite": "^7.3.6",
+    "vitest": "^4.1.11",
+    "vue-tsc": "^3.3.12"
   },
   "engines": {
     "node": ">=22.19"
+  },
+  "allowScripts": {
+    "@modelcontextprotocol/inspector@2.9.0": true,
+    "esbuild@0.25.12": true,
+    "esbuild@0.28.2": true,
+    "fsevents@2.3.3": true
   }
 }
