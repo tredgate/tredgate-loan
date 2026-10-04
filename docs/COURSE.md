@@ -14,14 +14,14 @@ The operations handbook in [docs/handbook](handbook/README.md) is written as if 
 | Documentation search | `rag/` | BM25 search over the handbook: CLI and HTTP API. The function the docs MCP server exposes |
 | MCP servers | `mcp/` | Empty apart from `test-tokens.json`. Participants create `mcp/loan/` and `mcp/docs/` |
 | Copilot instructions | `.github/copilot-instructions.md`, `.github/instructions/mcp-sdk.instructions.md` | Repository conventions, and an SDK v2 cheat sheet that applies to `mcp/**` |
-| Editor MCP configuration | `.vscode/mcp.json` | Empty `"servers": {}`; participants fill it in |
+| MCP configuration | `.mcp.json` | Empty `"mcpServers": {}`; participants fill it in. One file for VS Code (1.118+) and Copilot CLI; `.vscode/mcp.json` is deprecated and Copilot CLI no longer reads it |
 | Tests | `tests/` | Business rules, HTTP API, search |
 
 The branch is tagged `mcp-course-baseline`. The SDK v1 server this course replaces stays on `main` (`rag/mcp.ts`) for the v1 versus v2 comparison.
 
 ## Setup on a restricted machine
 
-Requirements: **Node.js 22.19 or newer** (the minimum the MCP Inspector supports; older versions only get an `EBADENGINE` warning from npm, so check `node --version`) and npm, pointed at the company npm mirror. Nothing else: no Docker, no database, no downloads at runtime.
+Requirements: **Node.js 22.19 or newer** (the minimum the MCP Inspector supports; older versions only get an `EBADENGINE` warning from npm, so check `node --version`) and npm, pointed at the company npm mirror, and **VS Code 1.118 or newer** (the first version that reads `.mcp.json`). Nothing else: no Docker, no database, no downloads at runtime.
 
 ```bash
 git clone <repository url>
@@ -44,6 +44,7 @@ Pre-course check, on the participant's machine:
 
 ```bash
 node --version          # v22.19.0 or newer
+code --version          # 1.118 or newer
 npm install
 npm run test
 npm run inspector       # opens the Inspector in the browser; Ctrl+C to stop
