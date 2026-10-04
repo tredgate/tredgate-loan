@@ -1,3 +1,9 @@
 {
-  "mcpServers": {}
+  "mcpServers": {
+    "tredgate-loan": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["tsx", "mcp/loan/server.ts"]
+    }
+  }
 }
