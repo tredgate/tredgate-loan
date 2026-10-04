@@ -1,0 +1,29 @@
+{
+  "warning": "TEST ONLY. Fake bearer tokens for the auth exercise of the MCP course. They protect nothing and must never be used outside a local exercise.",
+  "tokens": [
+    {
+      "token": "test-only-officer-token-not-a-secret",
+      "role": "officer",
+      "subject": "olivia.officer",
+      "handbookRole": "Loan Officer (POL-050: decides alone up to 50,000 USD)"
+    },
+    {
+      "token": "test-only-senior-token-not-a-secret",
+      "role": "senior",
+      "subject": "sam.senior",
+      "handbookRole": "Senior Loan Officer (POL-050: approves up to 100,000 USD, co-signs above)"
+    },
+    {
+      "token": "test-only-credit-risk-token-not-a-secret",
+      "role": "credit-risk",
+      "subject": "cara.creditrisk",
+      "handbookRole": "Credit Risk Analyst (POL-050: signs off approvals above 100,000 USD)"
+    },
+    {
+      "token": "test-only-auditor-token-not-a-secret",
+      "role": "auditor",
+      "subject": "aaron.auditor",
+      "handbookRole": "Compliance Officer (OPS-010: reconciles decisions, makes none)"
+    }
+  ]
+}

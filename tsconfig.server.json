@@ -22,5 +22,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["server/**/*.ts", "shared/**/*.ts", "rag/**/*.ts", "tests/**/*.ts"]
+  "include": ["server/**/*.ts", "shared/**/*.ts", "rag/**/*.ts", "tests/**/*.ts", "mcp/**/*.ts"]
 }
