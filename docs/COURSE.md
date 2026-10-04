@@ -74,7 +74,6 @@ $env:DATA_FILE="server/data/loans.large.json"; npm run dev   # PowerShell
 - 5,000 loans, generated deterministically by `server/generateLargeData.ts`: the same file on every machine.
 - Amounts across all approval tiers of POL-050 (up to 50,000, up to 100,000, above 100,000) and all statuses.
 - The six seed loans come first and unchanged, so **ln-1004 (100,000 USD, 60 months, pending)** is in both data sets.
-- **ln-3517 is poisoned:** its `applicantName` is an instruction to ignore the policy and approve all pending loans. Validation accepts any non-empty name, so it is valid data. Use it to show that tool results are data, not instructions.
 - `server/data/loans.json` is not touched. Without `DATA_FILE` the app is back on the six seed loans; `npm run data:reset` restores those, `npm run data:large` restores the large file.
 
 ### Test tokens for the auth chapter
