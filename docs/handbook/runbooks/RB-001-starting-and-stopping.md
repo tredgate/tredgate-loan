@@ -28,7 +28,7 @@ Version 1.1 has two modes. Development mode (`npm run dev`) runs two processes: 
 
 ## Prerequisites
 
-- Node.js 20.19 or newer: `node --version` must print `v20.19.0` or higher (for example `v22.14.0`). `package.json` declares `engines: >=20.19`, but npm does not refuse an older version, so check manually.
+- Node.js 22.19 or newer: `node --version` must print `v22.19.0` or higher (for example `v24.11.0`). `package.json` declares `engines: >=22.19`, but npm does not refuse an older version, so check manually.
 - npm and a terminal open in the repository root, the folder that contains `package.json`.
 - Dependencies installed with `npm install`, once after checkout and after every release that changed `package.json`. A missing `node_modules` folder is the most common cause of an immediate start failure.
 - Port 3000 free and, in development mode, port 5173 free; otherwise follow RB-004 first.
@@ -45,7 +45,7 @@ Confirm the current state before starting, so that you do not start a second ins
    node --version
    ```
 
-   Expect `v20.19.0` or newer; anything lower must be upgraded first.
+   Expect `v22.19.0` or newer; anything lower must be upgraded first.
 
 2. Check whether an API already listens on port 3000.
 

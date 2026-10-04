@@ -6,7 +6,7 @@ A small loan application management app used for GitHub Copilot training. Vue 3 
 
 Tredgate Loan is a teaching app, not a product. It is deliberately small so it can be understood in minutes, yet it has the pieces a real service has: an HTTP API, persisted data, validation, business rules and logs you can investigate.
 
-Everything runs locally with Node.js and npm. No Docker, no database, no external services. The only exception is the optional [vector search demo](#vector-search-demo-trainer-only) the trainer runs, which is a separate package and is not part of the participant setup.
+Everything runs locally with Node.js and npm. No Docker, no database, no external services.
 
 ## Features
 
@@ -31,7 +31,7 @@ Everything runs locally with Node.js and npm. No Docker, no database, no externa
 
 ### Prerequisites
 
-- Node.js 20.19 or newer (any current LTS)
+- Node.js 22.19 or newer (the MCP Inspector requires it; Node.js 24 LTS is fine)
 - npm
 
 ### Installation
@@ -79,6 +79,36 @@ npm run data:reset
 ```
 
 Restores `server/data/loans.json` from the seed file.
+
+### Large data set
+
+```bash
+npm run data:large
+```
+
+Generates `server/data/loans.large.json` with 5,000 loans (deterministic, the same file every run, not committed). It starts with the six seed loans and spreads the rest across all approval tiers (up to 50,000, up to 100,000, above 100,000) and all statuses. Point the API at it with `DATA_FILE`; `server/data/loans.json` stays untouched:
+
+```bash
+DATA_FILE=server/data/loans.large.json npm run dev        # macOS, Linux, Git Bash
+$env:DATA_FILE="server/data/loans.large.json"; npm run dev # PowerShell
+```
+
+Run `npm run data:large` again to restore it. Without `DATA_FILE`, the app is back on the six seed loans.
+
+## MCP course
+
+The MCP course builds its servers from scratch in `mcp/` (for example `mcp/loan/` and `mcp/docs/`). The repository prepares only what saves time or network access during the course:
+
+| What                                     | Where                                                                                         |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------- |
+| MCP TypeScript SDK v2, preinstalled      | `@modelcontextprotocol/server`, `@modelcontextprotocol/express`, `@modelcontextprotocol/node` |
+| MCP Inspector                            | `npm run inspector`                                                                           |
+| SDK v2 cheat sheet for Copilot           | `.github/instructions/mcp-sdk.instructions.md` (applies to `mcp/**`)                          |
+| Editor MCP configuration, empty          | `.vscode/mcp.json`                                                                            |
+| Fake bearer tokens for the auth exercise | `mcp/test-tokens.json` (roles `officer`, `senior`, `credit-risk`, `auditor`)                  |
+| Large data set                           | `npm run data:large`, see above                                                               |
+
+`tsconfig.server.json` includes `mcp/**/*.ts`, so `npm run build` and `npm run lint` check the servers too.
 
 ## Architecture
 
@@ -136,7 +166,7 @@ Levels: 30 = info, 40 = warn (expected rejections such as 400/404), 50 = error (
 | Variable    | Default                  | Purpose                                           |
 | ----------- | ------------------------ | ------------------------------------------------- |
 | `PORT`      | `3000`                   | Backend port                                      |
-| `DATA_FILE` | `server/data/loans.json` | Location of the data file                         |
+| `DATA_FILE` | `server/data/loans.json` | Location of the data file (see Large data set)    |
 | `LOG_FILE`  | `logs/app.log`           | Location of the log file                          |
 | `LOG_LEVEL` | `info`                   | pino log level (`debug`, `info`, `warn`, `error`) |
 | `RAG_PORT`  | `3001`                   | Documentation search API port                     |
@@ -161,15 +191,7 @@ The index is cached in `rag/index.json` (not committed) and rebuilt automaticall
 
 ### Using it from an AI assistant
 
-The same search is exposed three ways, so that it works whatever the editor policy allows:
-
-| Entry point | How                                                                                                                           | When                                                   |
-| ----------- | ----------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| HTTP API    | `GET http://localhost:3001/search?q=...&k=5`, `GET /health`, `POST /reindex`; started by `npm run dev` or `npm run rag:serve` | Default. Any assistant that can run `curl` can use it. |
-| Skill       | `.github/skills/loan-handbook-search/SKILL.md` documents the API for GitHub Copilot, which loads it for handbook questions    | Together with the API                                  |
-| MCP server  | `rag/mcp.ts` exposes a `search_docs` tool over stdio; configured in `.vscode/mcp.json` (`npm run rag:mcp` runs it by hand)    | Optional, where MCP servers are allowed                |
-
-Repository instructions in `.github/copilot-instructions.md` tell Copilot to use the search instead of reading the handbook.
+The same search is also served over HTTP: `GET http://localhost:3001/search?q=...&k=5`, `GET /health`, `POST /reindex`. `npm run dev` starts it, `npm run rag:serve` runs it alone. Repository instructions in `.github/copilot-instructions.md` tell Copilot to use the search instead of reading the handbook.
 
 ```
 rag/
@@ -180,30 +202,8 @@ rag/
 ├── config.ts        # docs root, index path, port (RAG_DOCS, RAG_INDEX, RAG_PORT)
 ├── cli.ts           # npm run rag / npm run rag:index
 ├── app.ts           # the HTTP API (Express)
-├── server.ts        # npm run rag:serve
-└── mcp.ts           # npm run rag:mcp (optional MCP stdio server)
+└── server.ts        # npm run rag:serve
 ```
-
-### Vector search demo (trainer only)
-
-`services/vector-rag/` is a second retriever over the same handbook, used by the trainer to show what a production-style vector RAG looks like. Where `rag/` ranks sections by keywords (BM25), this service embeds the same sections with an Ollama model (nomic-embed-text) and asks Qdrant, a vector database, for the nearest ones. Both run in Docker.
-
-- It serves the same `/search` API as `rag/`, but on port 3002.
-- `/compare` runs one question through BM25 and vector search side by side.
-- It is a separate package with its own `npm install`, so the participant setup above is unaffected.
-
-```bash
-cd services/vector-rag
-npm install
-npm run up            # Qdrant (:6333) and Ollama (:11434) in Docker
-npm run model:pull    # download the embedding model once (~300 MB)
-npm run index         # embed the handbook
-npm run dev           # API on http://localhost:3002
-npm run search -- "customer pays late" --compare
-npm run down          # stop the containers
-```
-
-Configuration, routes and file layout are in [services/vector-rag/README.md](services/vector-rag/README.md). The trainer's demo script is in [docs/COURSE.md](docs/COURSE.md).
 
 ## Project Structure
 
@@ -220,6 +220,7 @@ server/
 ├── logger.ts            # pino logger and per-request logging
 ├── errors.ts            # HttpError, 404 and error handler
 ├── reset.ts             # `npm run data:reset`
+├── generateLargeData.ts # `npm run data:large`
 └── data/
     └── loans.seed.json  # Seed data
 src/
@@ -237,7 +238,7 @@ tests/
 └── api.test.ts          # HTTP API against a temporary data file
 docs/handbook/           # Fictional operations handbook (policy, operations, runbooks, reference, known issues)
 rag/                     # Documentation search tool (see above)
-services/vector-rag/     # Vector search demo: Ollama embeddings + Qdrant (trainer only, own package)
+mcp/                     # MCP servers built during the course; test-tokens.json for the auth exercise
 ```
 
 ## License

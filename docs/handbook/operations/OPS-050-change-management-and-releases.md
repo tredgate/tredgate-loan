@@ -76,7 +76,7 @@ A Platform Engineer performs releases in a window the Operations Lead schedules 
 Before the release window:
 
 1. CI is green on `main`; the changelog has the new version heading and date; the handbook changes are merged; Known Issue entries fixed by the release are marked resolved.
-2. The Operations Lead has confirmed the window in the shift log and that `node --version` reports 20.19 or newer.
+2. The Operations Lead has confirmed the window in the shift log and that `node --version` reports 22.19 or newer.
 3. The rollback plan names the release commit, the previous tag, and whether a data file restore would be needed.
 
 During the release window, on the workstation:

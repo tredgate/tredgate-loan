@@ -33,7 +33,7 @@ Legitimate uses: initial installation, release verification on non-production wo
 ## Prerequisites
 
 - Written Operations Lead approval as described in "When to use this runbook".
-- Terminal access in the repository root and Node.js 20.19 or newer.
+- Terminal access in the repository root and Node.js 22.19 or newer.
 - The data file path in use. The default is `server/data/loans.json`. If the server runs with a DATA_FILE override (the `dataFile` field of the `Tredgate Loan API started` log line), the reset must be run with the same `DATA_FILE` value, otherwise it resets a different file than the one the server uses.
 - A backup location outside the repository folder, for example `~/tredgate-backups/`.
 - The UI closed on all browsers at the branch, or officers informed that they must reload afterwards.

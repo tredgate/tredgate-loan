@@ -52,10 +52,10 @@ Rules that follow:
 
 ## Node.js version requirement
 
-`package.json` declares `"engines": { "node": ">=20.19" }`. Node.js 20.19 or any newer release (22, 24) is supported; the CI pipeline runs on the current LTS release. Check the workstation with:
+`package.json` declares `"engines": { "node": ">=22.19" }`. Node.js 22.19 or any newer release (24) is supported; the CI pipeline runs on the current LTS release. Check the workstation with:
 
 ```bash
-node --version    # must print v20.19.0 or higher
+node --version    # must print v22.19.0 or higher
 npm --version
 ```
 

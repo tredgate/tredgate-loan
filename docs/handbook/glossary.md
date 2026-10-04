@@ -53,7 +53,7 @@ This glossary defines the business and technical terms used across the Tredgate 
 | Loan ID | The `id` of an application: seed records `ln-1001` to `ln-1006`; generated ids are a base36 timestamp plus random suffix, such as `muk5m5v2e3z5zkt`. Logged as `loanId`. |
 | Loan Officer | Front-line role in Lending Operations that creates applications, decides up to 50,000 USD alone, and may reject any application. |
 | Log level | Numeric severity of a log line: 30 info, 40 warn (expected rejections), 50 error (unexpected failures). |
-| Node.js and npm | The JavaScript runtime (20.19 or newer required) and its command runner, used for every Tredgate Loan command from `npm install` to `npm run data:reset`. |
+| Node.js and npm | The JavaScript runtime (22.19 or newer required) and its command runner, used for every Tredgate Loan command from `npm install` to `npm run data:reset`. |
 | On-call Platform Engineer | The Platform Engineering engineer reachable in branch business hours; responds to S1 within 15 minutes and S2 within 1 hour (OPS-040). |
 | Operations Lead | Role in Lending Operations that owns the branch workstation, runs the daily checklist (OPS-030), declares incidents, and approves data resets. |
 | Pending | The initial status and the only one in which approve, reject, and auto-decide are possible. Decided within 2 business days (OPS-020). |

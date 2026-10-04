@@ -82,7 +82,7 @@ Complete after the last applicant and before leaving. Expected duration: 10 minu
 
 | Task | Owner | Reference |
 |---|---|---|
-| Confirm `node --version` reports 20.19 or newer and note it in the shift log | Operations Lead | REF-030, changelog |
+| Confirm `node --version` reports 22.19 or newer and note it in the shift log | Operations Lead | REF-030, changelog |
 | Reconcile approved applications with the Decision Register and Tredgate Core Banking bookings | Compliance Officer | POL-070 |
 | Confirm no applicant names or other personal data appear in the log: `grep -c applicantName logs/app.log` must print 0 | Compliance Officer | OPS-060 |
 | Review the Known Issues register for anything relevant to the branch | Operations Lead | known-issues/README.md |

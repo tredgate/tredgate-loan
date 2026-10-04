@@ -54,7 +54,7 @@ Tredgate Loan is a single-instance application. Each branch runs exactly one cop
 
 | Concern | Owner | Notes |
 |---|---|---|
-| Hardware, operating system, Node.js 20.19 or newer | Operations Lead | Version checked monthly; upgrade coordinated with Platform Engineering |
+| Hardware, operating system, Node.js 22.19 or newer | Operations Lead | Version checked monthly; upgrade coordinated with Platform Engineering |
 | Starting and stopping the process (`npm start`, `npm run dev`) | Operations Lead | Procedure in RB-001; Loan Officers do not open a terminal |
 | Data file `server/data/loans.json` and its daily backup | Operations Lead | Backup at end of day per OPS-030; restore per RB-003 |
 | Log file `logs/app.log`, rotation and 30-day retention | Operations Lead | Standards in OPS-060; Compliance Officer may audit |
