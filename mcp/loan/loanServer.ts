@@ -1,4 +1,4 @@
-import { McpServer, ResourceTemplate } from '@modelcontextprotocol/server'
+import { McpServer, ResourceTemplate, type McpRequestContext } from '@modelcontextprotocol/server'
 import * as z from 'zod/v4'
 import type { LoanApplication } from '../../shared/loan'
 import { calculateMonthlyPayment } from '../../shared/loanRules'
@@ -20,8 +20,23 @@ async function fetchLoans(): Promise<LoanApplication[]> {
   return (await response.json()) as LoanApplication[]
 }
 
-// Builds a new server with all tools, resources and prompts. Used by the stdio and the HTTP entry point
-export function buildServer(): McpServer {
+// Roles from the token (mcp/test-tokens.json). stdio has no token and runs as the local user
+type Role = 'officer' | 'senior' | 'credit-risk' | 'auditor'
+
+// The highest amount a role may approve (POL-050). Roles that are not listed may not approve at all.
+// Above 100,000 USD two people must sign, so the server never approves those loans
+const APPROVAL_LIMIT: Partial<Record<Role, number>> = { officer: 50_000, senior: 100_000 }
+
+// Builds a new server for one request (HTTP) or one connection (stdio).
+// The tools, and what they show, depend on the role in the token
+export function buildServer(ctx?: McpRequestContext): McpServer {
+  const role = ctx?.authInfo?.extra?.role as Role | undefined
+  const user = ctx?.authInfo?.clientId ?? 'local user'
+
+  // The auditor reconciles decisions and needs no personal data (POL-070): hide the applicant name
+  const forRole = (loan: LoanApplication): LoanApplication =>
+    role === 'auditor' ? { ...loan, applicantName: '[hidden for the auditor role]' } : loan
+
   // Instructions are sent to the client in the initialize answer and tell the model how to read the data
   const server = new McpServer(
     { name: 'tredgate-loan', version: '1.0.0' },
@@ -40,7 +55,8 @@ export function buildServer(): McpServer {
         'Get one loan application by its id, for example ln-1004. Returns the amount (USD), term, interest rate, status and creation date.',
       inputSchema: z.object({
         id: z.string().describe('Loan id, for example ln-1004')
-      })
+      }),
+      annotations: { readOnlyHint: true }
     },
     async ({ id }) => {
       const loans = await fetchLoans()
@@ -51,7 +67,7 @@ export function buildServer(): McpServer {
           isError: true
         }
       }
-      return { content: [{ type: 'text', text: JSON.stringify(loan, null, 2) }] }
+      return { content: [{ type: 'text', text: JSON.stringify(forRole(loan), null, 2) }] }
     }
   )
 
@@ -64,7 +80,8 @@ export function buildServer(): McpServer {
         'List loan applications with their id, amount, term and status. Use it to find loans, for example all pending ones. Use get_loan for the full details of one loan.',
       inputSchema: z.object({
         status: z.enum(['pending', 'approved', 'rejected']).optional().describe('Only loans with this status')
-      })
+      }),
+      annotations: { readOnlyHint: true }
     },
     async ({ status }) => {
       const loans = (await fetchLoans()).filter((l) => !status || l.status === status)
@@ -84,7 +101,8 @@ export function buildServer(): McpServer {
         amount: z.number().positive().describe('Loan amount in USD'),
         termMonths: z.number().int().positive().describe('Term in months'),
         interestRate: z.number().min(0).max(1).describe('Yearly rate as a fraction, for example 0.08 for 8%')
-      })
+      }),
+      annotations: { readOnlyHint: true }
     },
     async ({ amount, termMonths, interestRate }) => {
       const monthly = calculateMonthlyPayment({ amount, termMonths, interestRate })
@@ -94,6 +112,67 @@ export function buildServer(): McpServer {
       }
     }
   )
+
+  // Tool: approve a loan. Registered only for roles that may approve, so the auditor never sees it
+  const limit = role ? APPROVAL_LIMIT[role] : undefined
+  if (limit !== undefined) {
+    server.registerTool(
+      'approve_loan',
+      {
+        title: 'Approve a loan application',
+        description:
+          'Approve one pending loan application. The server checks the approval authority ladder (POL-050) against the signed-in user and refuses loans above their limit. Confirm with the user before you approve.',
+        inputSchema: z.object({
+          id: z.string().describe('Loan id, for example ln-1004')
+        }),
+        annotations: { readOnlyHint: false, destructiveHint: true, idempotentHint: false }
+      },
+      async ({ id }) => {
+        const loan = (await fetchLoans()).find((l) => l.id === id)
+        if (!loan) {
+          return { content: [{ type: 'text', text: `No loan with id "${id}".` }], isError: true }
+        }
+        // The checks run in the server, whatever the model was told
+        if (loan.amount > 100_000) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Loan ${id} is ${loan.amount} USD. Above 100,000 USD, POL-050 requires a Senior Loan Officer and a Credit Risk Analyst to sign the Decision Register. This server does not approve such loans.`
+              }
+            ],
+            isError: true
+          }
+        }
+        if (loan.amount > limit) {
+          return {
+            content: [
+              {
+                type: 'text',
+                text: `Not approved. You are signed in as ${user} (${role}), who may approve up to ${limit} USD under POL-050. Loan ${id} is ${loan.amount} USD. Ask a Senior Loan Officer.`
+              }
+            ],
+            isError: true
+          }
+        }
+        // The decision goes through the Loan API, like every other client
+        const response = await fetch(`${API_URL}/loans/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: 'approved' })
+        })
+        if (!response.ok) {
+          const { error } = (await response.json()) as { error?: string }
+          return { content: [{ type: 'text', text: `The Loan API refused: ${error ?? response.status}` }], isError: true }
+        }
+        // Audit: the loan id and the user, never the applicant name (POL-070)
+        console.error(`[tredgate-loan] ${id} approved by ${user}`)
+        return {
+          content: [{ type: 'text', text: `Loan ${id} approved by ${user}. Record the decision in the Decision Register (POL-050).` }]
+        }
+      }
+    )
+  }
 
   // Resource template: loan://{id}. The user attaches a loan, the model does not ask for it
   server.registerResource(
@@ -114,7 +193,7 @@ export function buildServer(): McpServer {
       if (!loan) {
         throw new Error(`No loan with id "${id}"`)
       }
-      return { contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(loan, null, 2) }] }
+      return { contents: [{ uri: uri.href, mimeType: 'application/json', text: JSON.stringify(forRole(loan), null, 2) }] }
     }
   )
 
