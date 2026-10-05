@@ -100,7 +100,12 @@ serveStdio(() => {
     'loan',
     new ResourceTemplate('loan://{id}', {
       list: async () => ({
-        resources: (await fetchLoans()).map((l) => ({ uri: `loan://${l.id}`, name: l.id, mimeType: 'application/json' }))
+        resources: (await fetchLoans()).map((l) => ({
+          uri: `loan://${l.id}`,
+          name: l.id,
+          title: `Loan ${l.id} (${l.status})`,
+          mimeType: 'application/json'
+        }))
       })
     }),
     { title: 'Loan application', description: 'One loan application as JSON', mimeType: 'application/json' },
