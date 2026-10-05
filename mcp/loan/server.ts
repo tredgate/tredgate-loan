@@ -162,6 +162,7 @@ serveStdio(() => {
         resources: (await fetchLoans()).map((l) => ({
           uri: `loan://${l.id}`,
           name: l.id,
+          title: `Loan ${l.id} (${l.status})`,
           mimeType: "application/json",
         })),
       }),
