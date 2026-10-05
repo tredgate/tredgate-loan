@@ -33,6 +33,7 @@ Everything runs locally with Node.js and npm. No Docker, no database, no externa
 
 - Node.js 22.19 or newer (the MCP Inspector requires it; Node.js 24 LTS is fine)
 - npm
+- VS Code 1.118 or newer (the first version that reads MCP servers from `.mcp.json`)
 
 ### Installation
 
@@ -104,7 +105,7 @@ The MCP course builds its servers from scratch in `mcp/` (for example `mcp/loan/
 | MCP TypeScript SDK v2, preinstalled      | `@modelcontextprotocol/server`, `@modelcontextprotocol/express`, `@modelcontextprotocol/node` |
 | MCP Inspector                            | `npm run inspector`                                                                           |
 | SDK v2 cheat sheet for Copilot           | `.github/instructions/mcp-sdk.instructions.md` (applies to `mcp/**`)                          |
-| Editor MCP configuration, empty          | `.vscode/mcp.json`                                                                            |
+| MCP configuration, empty                 | `.mcp.json` (read by VS Code 1.118+ and Copilot CLI)                                          |
 | Fake bearer tokens for the auth exercise | `mcp/test-tokens.json` (roles `officer`, `senior`, `credit-risk`, `auditor`)                  |
 | Large data set                           | `npm run data:large`, see above                                                               |
 
