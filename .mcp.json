@@ -4,6 +4,13 @@
       "type": "stdio",
       "command": "npx",
       "args": ["tsx", "mcp/loan/server.ts"]
+    },
+    "tredgate-loan-http": {
+      "type": "http",
+      "url": "http://127.0.0.1:3002/mcp",
+      "headers": {
+        "Authorization": "Bearer test-only-officer-token-not-a-secret"
+      }
     }
   }
 }
