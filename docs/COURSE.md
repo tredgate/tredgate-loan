@@ -99,7 +99,7 @@ $env:DATA_FILE="server/data/loans.large.json"; npm run dev   # PowerShell
 |---|---|---|
 | `npm install` fails behind the mirror | Registry not configured | `npm config get registry` must show the company mirror |
 | `npm install` warns `EBADENGINE`, or the Inspector misbehaves | Node.js older than 22.19 (unsupported, though the Inspector may still start) | Upgrade Node.js |
-| Client reports a JSON parse error from a stdio server | Something printed to stdout | Log with `console.error` only |
+| Client reports a JSON parse error from a stdio server | Something printed to stdout (the SDK v2 client skips such lines, other clients may not) | Log with `console.error` only |
 | Copilot writes `@modelcontextprotocol/sdk` imports or `server.tool(...)` | SDK v1 from training data | Point it at `.github/instructions/mcp-sdk.instructions.md` or Context7 |
 | HTTP server answers 401 "Token has no expiration time" | Verifier returns no `expiresAt` | Return `expiresAt` in seconds since epoch |
 | HTTP server answers 500 for a wrong token | Verifier throws a plain `Error` | Throw `OAuthError(OAuthErrorCode.InvalidToken, ...)` |

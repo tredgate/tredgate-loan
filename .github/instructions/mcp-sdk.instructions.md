@@ -51,7 +51,7 @@ serveStdio(() => {
 
 ## Logging: stderr only
 
-Over stdio, stdout carries JSON-RPC. Any `console.log` breaks the connection (the client reports a parse error). Log with `console.error(...)` only, also in code the server imports.
+Over stdio, stdout carries JSON-RPC. stdout is reserved for protocol messages. The SDK v2 client skips stray lines, but the specification forbids them and other clients may drop the connection. Log with `console.error(...)` only, also in code the server imports.
 
 ## Streamable HTTP with Express
 
@@ -74,12 +74,13 @@ const verifier: OAuthTokenVerifier = {
   }
 }
 
-const app = createMcpExpressApp() // binds 127.0.0.1, runs express.json(), checks Host and Origin
+const app = createMcpExpressApp() // adds express.json() and Host/Origin checks against DNS rebinding; does not choose the listening address
 const node = toNodeHandler(createMcpHandler(buildServer))
 app.all('/mcp', requireBearerAuth({ verifier }), (req, res) => void node(req, res, req.body))
-app.listen(3010, () => console.error('MCP server on http://localhost:3010/mcp'))
+app.listen(3010, '127.0.0.1', () => console.error('MCP server on http://localhost:3010/mcp'))
 ```
 
+- Always pass `'127.0.0.1'` to `app.listen`. Without a host, the server listens on every network interface, and a client on the network can get past the Host check by sending `Host: localhost` itself.
 - `createMcpHandler` calls the factory for every request, so each request gets a fresh `McpServer`.
 - `verifyAccessToken` returns an `AuthInfo`: `token`, `clientId`, `scopes` and `expiresAt` (seconds since epoch) are required; without `expiresAt` every request gets 401 "Token has no expiration time". Extra data such as a role goes into `extra`.
 - `requireBearerAuth` answers 401 for a missing or unknown token and puts the verified `AuthInfo` on `req.auth`. A tool handler reads it from its second argument: `ctx.http?.authInfo`.
