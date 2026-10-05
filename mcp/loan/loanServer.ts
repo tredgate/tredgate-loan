@@ -62,31 +62,77 @@ export function buildServer(ctx?: McpRequestContext): McpServer {
       const loans = await fetchLoans()
       const loan = loans.find((l) => l.id === id)
       if (!loan) {
-        return {
-          content: [{ type: 'text', text: `No loan with id "${id}". Known ids: ${loans.map((l) => l.id).join(', ')}` }],
-          isError: true
-        }
+        // List the known ids only while there are few of them. With 5,000 loans the list alone would be 11,000 tokens
+        const hint = loans.length <= 20 ? `Known ids: ${loans.map((l) => l.id).join(', ')}` : 'Use list_loans to find the id.'
+        return { content: [{ type: 'text', text: `No loan with id "${id}". ${hint}` }], isError: true }
       }
       return { content: [{ type: 'text', text: JSON.stringify(forRole(loan), null, 2) }] }
     }
   )
 
-  // Tool: all loans, optionally filtered by status. One short line per loan instead of JSON
+  // Tool: one page of loans, filtered on the server. One short line per loan instead of JSON
   server.registerTool(
     'list_loans',
     {
       title: 'List loan applications',
       description:
-        'List loan applications with their id, amount, term and status. Use it to find loans, for example all pending ones. Use get_loan for the full details of one loan.',
+        'List loan applications with their id, amount, term and status, one page at a time. Filter by status and maximum amount. Use loan_summary first for an overview, and get_loan for the full details of one loan.',
       inputSchema: z.object({
-        status: z.enum(['pending', 'approved', 'rejected']).optional().describe('Only loans with this status')
+        status: z.enum(['pending', 'approved', 'rejected']).optional().describe('Only loans with this status'),
+        maxAmount: z
+          .number()
+          .positive()
+          .optional()
+          .describe('Only loans up to this amount in USD, for example 50000 for what a Loan Officer may approve'),
+        limit: z.number().int().min(1).max(100).default(20).describe('How many loans to return, at most 100'),
+        offset: z.number().int().min(0).default(0).describe('How many matching loans to skip, for the next page')
       }),
       annotations: { readOnlyHint: true }
     },
-    async ({ status }) => {
-      const loans = (await fetchLoans()).filter((l) => !status || l.status === status)
-      const lines = loans.map((l) => `${l.id}: ${l.amount} USD, ${l.termMonths} months, ${l.status}`)
-      return { content: [{ type: 'text', text: lines.join('\n') || 'No loans found.' }] }
+    async ({ status, maxAmount, limit, offset }) => {
+      const matching = (await fetchLoans()).filter(
+        (l) => (!status || l.status === status) && (maxAmount === undefined || l.amount <= maxAmount)
+      )
+      if (matching.length === 0) {
+        return { content: [{ type: 'text', text: 'No loans found.' }] }
+      }
+      const page = matching.slice(offset, offset + limit)
+      if (page.length === 0) {
+        return { content: [{ type: 'text', text: `No loans at offset ${offset}. There are ${matching.length} matching loans.` }] }
+      }
+      // Tell the model where it is and how to get the next page
+      const next = offset + limit < matching.length ? ` Next page: offset ${offset + limit}.` : ''
+      const header = `Loans ${offset + 1}-${offset + page.length} of ${matching.length}.${next}`
+      const lines = page.map((l) => `${l.id}: ${l.amount} USD, ${l.termMonths} months, ${l.status}`)
+      return { content: [{ type: 'text', text: [header, ...lines].join('\n') }] }
+    }
+  )
+
+  // Tool: a few numbers instead of thousands of lines. Summary first, details on demand
+  server.registerTool(
+    'loan_summary',
+    {
+      title: 'Summarise the loan applications',
+      description:
+        'Count loan applications by status with their total amount, and split the pending ones by approval tier (POL-050). Use it first for an overview, then list_loans for the loans you need.',
+      annotations: { readOnlyHint: true }
+    },
+    async () => {
+      const loans = await fetchLoans()
+      const byStatus = (['pending', 'approved', 'rejected'] as const).map((status) => {
+        const group = loans.filter((l) => l.status === status)
+        const total = group.reduce((sum, l) => sum + l.amount, 0)
+        return `${status}: ${group.length} loans, ${total} USD`
+      })
+      const pending = loans.filter((l) => l.status === 'pending')
+      const tiers = [
+        `up to 50,000 USD (Loan Officer): ${pending.filter((l) => l.amount <= 50_000).length}`,
+        `50,000.01 to 100,000 USD (Senior Loan Officer): ${pending.filter((l) => l.amount > 50_000 && l.amount <= 100_000).length}`,
+        `above 100,000 USD (Senior Loan Officer and Credit Risk): ${pending.filter((l) => l.amount > 100_000).length}`
+      ]
+      return {
+        content: [{ type: 'text', text: [`${loans.length} loan applications`, ...byStatus, 'Pending by approval tier:', ...tiers].join('\n') }]
+      }
     }
   )
 
@@ -178,13 +224,18 @@ export function buildServer(ctx?: McpRequestContext): McpServer {
   server.registerResource(
     'loan',
     new ResourceTemplate('loan://{id}', {
+      // A picker for the current work, not an export: the 50 newest pending loans. Any loan can still be read by its URI
       list: async () => ({
-        resources: (await fetchLoans()).map((l) => ({
-          uri: `loan://${l.id}`,
-          name: l.id,
-          title: `Loan ${l.id} (${l.status})`,
-          mimeType: 'application/json'
-        }))
+        resources: (await fetchLoans())
+          .filter((l) => l.status === 'pending')
+          .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+          .slice(0, 50)
+          .map((l) => ({
+            uri: `loan://${l.id}`,
+            name: l.id,
+            title: `Loan ${l.id} (${l.status})`,
+            mimeType: 'application/json'
+          }))
       })
     }),
     { title: 'Loan application', description: 'One loan application as JSON', mimeType: 'application/json' },
